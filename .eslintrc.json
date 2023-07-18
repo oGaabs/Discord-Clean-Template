@@ -1,0 +1,46 @@
+{
+    "extends": ["eslint:recommended", "google"],
+    "env": {
+        "node": true,
+        "browser": true,
+        "commonjs": true,
+        "es2021": true
+    },
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "indent": [2, 4, {
+            "ImportDeclaration": "first" ,
+            "ObjectExpression": "first",
+            "VariableDeclarator": { "let": 2, "const": 3},
+            "SwitchCase": 1
+        }],
+        "linebreak-style": [
+            "error",
+            "windows"
+        ],
+        "quotes": [
+            "error",
+            "double"
+        ],
+        "allowTemplateLiterals": 0,
+        "no-unused-vars": [2, {"vars": "all", "args": "all", "argsIgnorePattern": "^_"}],
+        "semi": [
+            "error",
+            "never"
+        ],
+        "object-curly-spacing": ["error", "always", { "arraysInObjects": false }],
+        "max-len": ["error", { "code": 130, "ignoreStrings": true } ],
+        "require-jsdoc": ["error", {
+            "require": {
+                "FunctionDeclaration": true,
+                "MethodDefinition": false,
+                "ClassDeclaration": false,
+                "ArrowFunctionExpression": false,
+                "FunctionExpression": false
+            }
+        }],
+        "curly": ["error", "multi-or-nest"]
+    }
+}
