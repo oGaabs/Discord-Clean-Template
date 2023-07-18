@@ -1,0 +1,60 @@
+{
+  "name": "punibot",
+  "version": "1.0.0",
+  "description": "A Simple Discord bot made with Discord.js and Node.js",
+  "main": "index.js",
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "scripts": {
+    "start": "node src/index",
+    "dev": "nodemon --delay 12 src/index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Gabriel Santana Silva",
+  "license": "MIT",
+  "dependencies": {
+    "ansi-colors": "^4.1.3",
+    "axios": "^1.4.0",
+    "discord.js": "^14.11.0",
+    "dotenv": "^16.3.1",
+    "express": "^4.18.2",
+    "module-alias": "^2.2.3",
+    "moment": "^2.29.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-jsdoc": "^46.4.3",
+    "husky": "^8.0.3",
+    "nodemon": "^2.0.22"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/PuniGC/PuniBot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/PuniGC/PuniBot/issues",
+    "email": "gabriel04.ok@gmail.com"
+  },
+  "homepage": "https://github.com/PuniGC/PuniBot#readme",
+  "_moduleAliases": {
+    "@application": "src/application",
+    "@domain": "src/domain",
+    "@infrastructure": "src/infrastructure",
+    "@infra": "src/infrastructure",
+    "@utils": "src/infrastructure/utils"
+  }
+}
