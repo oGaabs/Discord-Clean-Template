@@ -29,30 +29,25 @@ ___
 
 * Clean Architecture Design
 * Command and Event Handlers
-* Error Handling
 * Configurable Constants
 * Easy Integration with Discord.js v14
 * Focus on High Performance and Scalability
 
 #### Commands
 
-* MusicBot (Play, Stop, Skip, Queue, Loop, ...) - (Check PuniMusic repo!)
-* Entertainment (Flip a coin, Search Gifs, and Ship Friends)
-* Information (Avatar, Help, Invite, Ping, Word)
-* Moderation (Clear, Spam)
+* SlashCommands (Ping, Say, Random)
+* Events (AutoRole, WelcomeEmbed)
 * Random Number Generator
-* FreeGames (Steam and Epic games)
+* Tasks (Update bot message satus (botActivity every 30 segs) and Update member count of guild in channel(updateMemberCount every 20 segs) )
 
 #### Event Listeners
 
 * Logger System with Colors in CLI
 * Command Handler
 * Event Handler
-* Error Handler
+* Task Scheduled
 
 **More features to be added in the future:**
-
-* Welcome and Goodbye modules, AutoRole, and Members count channel
 
 ## ✅ Requirements:
 
@@ -65,16 +60,16 @@ Feel free to send suggestions, tips, or even refactor the code, but keep the aut
 
 #### 🌐❤ Team:
 
-* **Gabriel Santana Silva** - *Owner* - [Instagram](https://www.instagram.com/gabrielsants_dev/)
+* **Gabriel Santana Silva** - *Owner* - [Instagram](https://www.instagram.com/oGaabs__/)
 
 ## 📝 License
 
 This project is licensed under the [MIT LICENSE][license].
 
 ---
-[github-ga]: https://github.com/PuniGC
+[github-ga]: https://github.com/oGaabs
 [linkedin-ga]: https://www.linkedin.com/in/gabriel-santana-silva/
 [email-ga]: mailto:gabriel04.ok@gmail.com
-[instagram-ga]: https://www.instagram.com/gabrielsants_dev/
+[instagram-ga]: https://www.instagram.com/oGaabs__/
 [discord-ga]: https://dsc.bio/punidc
 [license]: LICENSE
