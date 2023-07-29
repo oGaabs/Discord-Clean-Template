@@ -1,5 +1,5 @@
 const { Client, Events, REST, Routes } = require("discord.js")
-const logger = require("../utils/Logger")
+const logger = require("../../utils/Logger")
 
 const MessageService = require("./MessageService")
 const EventService = require("./EventService")
@@ -37,10 +37,10 @@ class DiscordService extends Client {
         await this.loginInDiscordAPI(token)
     }
 
-    async setupRestAPI(slashCommandsToRegister) {
+    async registerSlashCommands(commands) {
         await this.rest.put(
             Routes.applicationCommands(this.user.id),
-            { body: slashCommandsToRegister },
+            { body: commands },
         )
             .then(() => this.logger.warn("[DEBUG] ::", "Slash Commands registrados com sucesso!", true))
             .catch((err) => this.logger.error("[FAIL] ::", "Falha ao registrar os Slash Commands : " + err, true))
@@ -50,6 +50,32 @@ class DiscordService extends Client {
         await this.login(token)
             .then(() => this.logger.warn("[DEBUG] ::", `Logado como ${this.user.tag}.\n`, true))
             .catch((err) => this.logger.error("[FAIL] ::", "Falha ao iniciar o bot : " + err, true))
+    }
+
+    async logoutFromDiscordAPI() {
+        await this.destroy()
+            .then(() => this.logger.warn("[DEBUG] ::", "Deslogado do Discord.\n", true))
+            .catch((err) => this.logger.error("[FAIL] ::", "Falha ao deslogar do Discord : " + err, true))
+    }
+
+    async getPing() {
+        return this.ws.ping
+    }
+
+    async updatePresence(presense) {
+        try {
+            this.user.setPresence({
+                activities: [{
+                    name: presense.name,
+                    type: presense.type,
+                }],
+                status: presense.status,
+            })
+
+            // this.logger.warn("[DEBUG] ::", "Presença atualizada com sucesso!", true)
+        } catch (error) {
+            this.logger.error("[FAIL] ::", "Falha ao atualizar a presença : " + error, true)
+        }
     }
 }
 

@@ -8,17 +8,14 @@ class InteractionHandler {
         if (interaction.user.bot)
             return
 
-        if (interaction.isCommand()) {
+        if (interaction.isCommand())
             return this.handleCommandInteraction(interaction, discordService)
-        }
 
-        if (interaction.isButton()) {
+        if (interaction.isButton())
             return this.handleButtonInteraction(interaction, discordService)
-        }
 
-        if (interaction.isSelectMenu()) {
+        if (interaction.isSelectMenu())
             return this.handleSelectMenuInteraction(interaction, discordService)
-        }
     }
 
 

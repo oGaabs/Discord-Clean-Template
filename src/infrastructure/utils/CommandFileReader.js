@@ -1,6 +1,6 @@
-const Fs = require('node:fs')
-const Path = require('node:path')
-const logger = require('@utils/Logger')
+const Fs = require("node:fs")
+const Path = require("node:path")
+const logger = require("@utils/Logger")
 
 class CommandFileReader {
     constructor(arrays = {}) {
@@ -15,7 +15,7 @@ class CommandFileReader {
     }
 
     loadDirectory(currentPath, jsFiles = []) {
-        console.log(`\n[${logger.getDate()}] Directory: ${currentPath.split('/').pop()}`)
+        console.log(`\n[${logger.getDate()}] Directory: ${currentPath.split("/").pop()}`)
 
         try {
             // Le os arquivos de comando no caminho especificado e armazena-os no this.commands
@@ -26,24 +26,22 @@ class CommandFileReader {
                 const stats = Fs.statSync(filePath)
 
                 // Caso seja um arquivo, carrega para o array
-                if (stats.isFile() && file.endsWith('.js')) {
+                if (stats.isFile() && file.endsWith(".js")) {
                     try {
                         const ClassFile = require(Path.join(process.cwd(), filePath))
 
                         jsFiles.push(ClassFile)
 
-                        return logger.debug('[DEBUG] ::', ` (${++index}/${jsFiles.length}) Loaded ${file}.`)
-                    }
-                    catch (err) {
+                        return logger.debug("[DEBUG] ::", ` (${++index}/${jsFiles.length}) Loaded ${file}.`)
+                    } catch (err) {
                         console.error(err)
-                        return logger.error('[FAIL] ::', `(${++index}) Fail when loading ${file}.`, false, err)
+                        return logger.error("[FAIL] ::", `(${++index}) Fail when loading ${file}.`, false, err)
                     }
                 }
 
                 // Caso se um diretorio, carrega todos os arquivos dentro dele
-                if (stats.isDirectory()) {
+                if (stats.isDirectory())
                     this.loadDirectory(filePath, jsFiles)
-                }
             })
 
             return jsFiles

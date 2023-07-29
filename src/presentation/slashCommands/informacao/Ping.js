@@ -20,7 +20,7 @@ class Ping extends SlashCommand {
         await interaction.deferReply()
 
         // get the args from interaction, receving channel and message to send
-        const message = `🏓 Pong! ${client.ws.ping}ms`
+        const message = `🏓 Pong! ${client.getPing()}ms`
 
         // send the message
         client.messageService.sendInteractionReply(interaction, message)

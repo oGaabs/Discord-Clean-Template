@@ -1,16 +1,23 @@
+const { PermissionFlagsBits } = require("discord.js")
+
 class GuildService {
-    constructor(discordService, guildId) {
-        this.discordService = discordService
+    constructor(client, guildId) {
+        this.client = client
         this.guildId = guildId
     }
 
     async getGuild(guildId = this.guildId) {
-        return await this.discordService.guilds.fetch(guildId)
+        return await this.client.guilds.fetch(guildId)
     }
 
     async getMember(memberId) {
         const guild = await this.getGuild()
         return guild.members.cache.get(memberId)
+    }
+
+    async getChannel(channelId) {
+        const guild = await this.getGuild()
+        return guild.channels.cache.get(channelId)
     }
 
     async getMemberByTag(memberTag) {
@@ -23,11 +30,16 @@ class GuildService {
         return guild.members.cache.find((member) => member.nickname === memberNickname)
     }
 
+    async getMemberCount() {
+        const guild = await this.getGuild()
+        return guild.memberCount
+    }
+
     async addRoleToMember(member, roleId) {
         const guild = member.guild
         const role = guild.roles.cache.get(roleId)
-        const botHighestRole = guild.members.cache.get(guild.me.id).roles.highest
-
+        const botInGuild = guild.members.cache.get(this.client.user.id)
+        const botHighestRole = botInGuild.roles.highest
         if (!role) {
             console.log(`Role with ID ${roleId} not found.`)
             throw new Error(`Role with ID ${roleId} not found.`)
@@ -39,20 +51,19 @@ class GuildService {
         }
 
         if (member.roles.cache.has(role.id)) {
-            console.log(`Role with ID ${roleId} already added to member ${member.user.username}.`)
-            throw new Error(`Role with ID ${roleId} already added to member ${member.user.username}.`)
+            console.log(`Role with ID ${roleId} already added to member ${member.user.tag}.`)
+            throw new Error(`Role with ID ${roleId} already added to member ${member.user.tag}.`)
         }
 
         // Check if bot has permissions to add role to member
-        if (!guild.me.hasPermission("MANAGE_ROLES") && !guild.me.hasPermission("ADMINISTRATOR")) {
-            if (role.position > guild.me.roles.highest.position) {
-                console.log(`Role with ID ${roleId} is higher than bot's highest role.`)
-                throw new Error(`Role with ID ${roleId} is higher than bot's highest role.`)
-            }
+        if (!botInGuild.permissions.has(PermissionFlagsBits.ManageRoles) &&
+            !botInGuild.permissions.has(PermissionFlagsBits.Administrator)) {
+            console.log(`Bot doesn't have permissions to add ${role.name} to member.`)
+            throw new Error(`Bot doesn't have permissions to add ${role.name} to member.`)
         }
 
         await member.roles.add(role)
-        console.log(`Added role ${role.name} to member ${member.user.username}`)
+        console.log(`Added role ${role.name} to member ${member.user.tag}`)
     }
 
     async removeRoleFromMember(member, roleId) {
@@ -65,7 +76,7 @@ class GuildService {
         }
 
         await member.roles.remove(role)
-        console.log(`Removed role ${role.name} from member ${member.user.username}`)
+        console.log(`Removed role ${role.name} from member ${member.tag}`)
     }
 
     async checkIfMemberHasRoleById(member, roleId) {
@@ -103,6 +114,12 @@ class GuildService {
     async checkIfMemberIsFromGuild(member) {
         const guild = await this.getGuild()
         return member.guild.id === guild.id
+    }
+
+    async getFooter() {
+        const guild = await this.getGuild()
+
+        return guild ? { text: guild.name, iconURL: await guild.iconURL({ dynamic: true, size: 1024 }) } : null
     }
 }
 

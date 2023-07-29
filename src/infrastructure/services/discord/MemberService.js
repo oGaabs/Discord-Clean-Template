@@ -1,9 +1,10 @@
-const Guild = require("../models/Guild")
+const GuildService = require("./GuildService")
 
 class MemberService {
     constructor(discordService, guildId, memberId) {
-        this.guild = new Guild(discordService, guildId)
+        this.discordService = discordService
         this.memberId = memberId
+        this.guild = new GuildService(discordService, guildId)
     }
 
     async getMember(memberId) {
@@ -31,7 +32,9 @@ class MemberService {
     }
 
     async getMemberDisplayAvatarURL(member, options = { dynamic: true, format: "png", size: 1024 }) {
-        return member.user.displayAvatarURL(options) || member.user.defaultAvatarURL || "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
+        const avatarUrl = member?.user?.displayAvatarURL(options) || member?.user?.defaultAvatarURL ||
+                            "https://discordapp.com/assets/322c936a8c8be1b803cd94861bdfa868.png"
+        return avatarUrl
     }
 
     async addRoleToMember(member, roleId) {

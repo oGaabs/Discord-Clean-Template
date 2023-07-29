@@ -1,18 +1,18 @@
 require("dotenv").config() // Carrega as variáveis de ambiente
-require('module-alias/register') // Carrega os aliases para os módulos
+require("module-alias/register") // Carrega os aliases para os módulos
 
 const { GatewayIntentBits } = require("discord.js")
 
-const DiscordService = require("@infra/Services/DiscordService")
-const CommandService = require("@application/CommandService")
+const DiscordService = require("@infra/services/discord/DiscordService")
+const CommandManager = require("@application/CommandManager")
 const FileReader = require("@utils/CommandFileReader")
 const InteractionHandler = require("@application/interactions/InteractionHandler")
-const ExpressService = require('@infra/Services/ExpressService')
+const ExpressService = require("@infra/services/express/ExpressService")
 
 // Cria as instâncias das dependências
 const fileReader = new FileReader()
-const commandService = new CommandService(process.env.PREFIX, fileReader)
-const interactionHandler = new InteractionHandler(commandService)
+const commandManager = new CommandManager(process.env.PREFIX, fileReader)
+const interactionHandler = new InteractionHandler(commandManager)
 const expressService = new ExpressService()
 
 const discordService = new DiscordService({
@@ -31,10 +31,11 @@ const discordService = new DiscordService({
 // Configura as dependências
 discordService.onSetupForStart((service) => {
     service.interactionHandler = interactionHandler
-    service.commandHandler = commandService
+    service.commandHandler = commandManager
 
-    commandService.populateCommands("./src/application/slashcommands", service)
-    commandService.populateListeners("./src/Infrastructure/listeners", service)
+    commandManager.populateCommands("./src/presentation/slashcommands", service)
+    commandManager.populateListeners("./src/presentation/events", service)
+    commandManager.registerTasks("./src/presentation/tasks", service)
 })
 
 // Inicia a conexão com a API Discord

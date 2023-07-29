@@ -6,11 +6,7 @@ class Listener {
         this.performOneTime = options.performOneTime || false
     }
 
-    async handleEvent(_event) {
-        throw new Error("The method handleEvent must be implemented")
-    }
-
-    async executeCallback(_client) {
+    async execute(_client, ..._args) {
         throw new Error("The method executeCallback must be implemented")
     }
 }
