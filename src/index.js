@@ -6,13 +6,13 @@ const { GatewayIntentBits } = require("discord.js")
 const DiscordService = require("@infra/services/discord/DiscordService")
 const CommandManager = require("@application/CommandManager")
 const FileReader = require("@utils/CommandFileReader")
-const InteractionHandler = require("@application/interactions/InteractionHandler")
+const CommandHandler = require("@application/CommandHandler")
 const ExpressService = require("@infra/services/express/ExpressService")
 
 // Cria as instâncias das dependências
 const fileReader = new FileReader()
-const commandManager = new CommandManager(process.env.PREFIX, fileReader)
-const interactionHandler = new InteractionHandler(commandManager)
+const commandManager = new CommandManager(fileReader, process.env.PREFIX)
+const commandHandler = new CommandHandler(commandManager, process.env.PREFIX)
 const expressService = new ExpressService()
 
 const discordService = new DiscordService({
@@ -30,10 +30,9 @@ const discordService = new DiscordService({
 
 // Configura as dependências
 discordService.onSetupForStart((service) => {
-    service.interactionHandler = interactionHandler
-    service.commandHandler = commandManager
+    service.commandHandler = commandHandler
 
-    commandManager.populateCommands("./src/presentation/slashcommands", service)
+    commandManager.populateSlashCommands("./src/presentation/slashcommands", service)
     commandManager.populateListeners("./src/presentation/events", service)
     commandManager.registerTasks("./src/presentation/tasks", service)
 })

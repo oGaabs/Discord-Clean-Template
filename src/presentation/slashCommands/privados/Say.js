@@ -30,6 +30,16 @@ class Say extends SlashCommand {
         // send the message
         client.messageService.sendInteractionReply(interaction, message)
     }
+
+    async executeFromMessage(message, args, client) {
+        // get the args from message, receving channel and message to send
+        const messageText = args.join("")
+        if (messageText == "")
+            return client.messageService.replyMessage(message, "Você precisa digitar uma mensagem para eu falar!")
+
+        // send the message
+        client.messageService.sendTextToChannelWithMessage(message, messageText)
+    }
 }
 
 module.exports = Say

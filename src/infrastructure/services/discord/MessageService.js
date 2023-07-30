@@ -5,9 +5,19 @@ class MessageService {
         this.discordService = discordService
     }
 
-    async sendMessageToChannel(channel, message) {
+    async sendTextToChannelWithMessage(message, text) {
+        const channel = message.channel
+        if (channel?.type === ChannelType.GuildText)
+            await channel.send(text)
+    }
+
+    async replyMessage(message, text) {
+        await message.reply(text)
+    }
+
+    async sendMessageToChannel(channel, text) {
         if (channel.type === ChannelType.GuildText)
-            await channel.send(message)
+            await channel.send(text)
     }
 
     async sendInteractionReply(interaction, text) {

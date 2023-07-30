@@ -12,18 +12,22 @@ class Ping extends SlashCommand {
                 .toJSON(),
             aliases: ["pong", "latencia"],
             description: "Obter ping do bot",
-            category: "privados",
+            category: "informacao",
         })
     }
 
     async execute(interaction, client) {
         await interaction.deferReply()
 
-        // get the args from interaction, receving channel and message to send
-        const message = `🏓 Pong! ${client.getPing()}ms`
+        const message = `🏓 Pong! ${await client.getPing()}ms`
 
-        // send the message
         client.messageService.sendInteractionReply(interaction, message)
+    }
+
+    async executeFromMessage(message, _args, client) {
+        const messageText = `🏓 Pong! ${await client.getPing()}ms`
+
+        client.messageService.sendTextToChannelWithMessage(message, messageText)
     }
 }
 

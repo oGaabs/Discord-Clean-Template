@@ -3,20 +3,18 @@ const EventManager = require("./EventManager")
 const Scheduler = require("@infrastructure/utils/Scheduler")
 
 class CommandManager {
-    constructor(prefix, fileReader, eventManager) {
-        this.commands = new Collection()
+    constructor(fileReader, prefix, eventManager, scheduler) {
         this.listeners = new Collection()
-        this.slashCommands = new Collection()
-        this.EventObservers = new Collection()
+        this.commands = new Collection()
 
-        this.EventManager = eventManager || new EventManager()
-        this.Scheduler = eventManager || new Scheduler()
+        this.eventManager = eventManager || new EventManager()
+        this.scheduler = scheduler || new Scheduler()
 
         this.prefix = prefix
         this.fileReader = fileReader
     }
 
-    async populateCommands(commandsPath, clientInstance) {
+    async populateSlashCommands(commandsPath, clientInstance) {
         const files = this.fileReader.readDirectoryFiles(commandsPath)
 
         files.forEach((File) => {
@@ -24,13 +22,13 @@ class CommandManager {
                 const slashCommand = new (File)(clientInstance)
                 const commandName = slashCommand.data.name.toLowerCase()
 
-                this.slashCommands.set(commandName, slashCommand)
+                this.commands.set(commandName, slashCommand)
             } catch (error) {
                 console.error(error)
             }
         })
 
-        const slashCommandsToRegister = this.slashCommands.map((slashCommand) => slashCommand.data)
+        const slashCommandsToRegister = this.commands.map((slashCommand) => slashCommand.data)
         await clientInstance.registerSlashCommands(slashCommandsToRegister)
     }
 
@@ -44,8 +42,8 @@ class CommandManager {
                 const eventDiscord = Listener.eventDiscord
 
                 this.listeners.set(listenerName, Listener)
-                this.EventManager.registerEvent(clientInstance, eventDiscord)
-                this.EventManager.registerObserver(eventDiscord, Listener, Listener.performOneTime)
+                this.eventManager.registerEvent(clientInstance, eventDiscord)
+                this.eventManager.registerObserver(eventDiscord, Listener, Listener.performOneTime)
             } catch (error) {
                 console.error(error)
             }
@@ -59,29 +57,32 @@ class CommandManager {
             try {
                 const task = new (File)(clientInstance)
 
-                this.Scheduler.registerTask(task)
+                this.scheduler.registerTask(task)
             } catch (error) {
                 console.error(error)
             }
         })
 
-        this.Scheduler.startTasks()
+        this.scheduler.startTasks()
     }
 
     async handleInteraction(interaction, discordService) {
-        const slashCommand = this.slashCommands.get(interaction.commandName)
+        const slashCommand = this.commands.get(interaction.commandName)
         if (!slashCommand)
             return
 
         slashCommand.execute(interaction, discordService)
     }
 
-    async handleCommand(commandName, args, message, discordService) {
+    async handleMessageCommand(message, discordService) {
+        const args = message.content.slice(this.prefix.length).trim().split(/\s+/)
+        const commandName = args.shift().toLowerCase()
+
         const messageCommand = this.commands.get(commandName)
-        if (!messageCommand)
+        if (!messageCommand || messageCommand.executeFromMessage === undefined)
             return
 
-        messageCommand.execute(message, args, discordService)
+        messageCommand.executeFromMessage(message, args, discordService)
     }
 }
 

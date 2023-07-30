@@ -1,6 +1,6 @@
 const { TIMES } = require("@infra/utils/Constants")
-const Task = require("@domain/models/Task")
 const { ActivityType, PresenceUpdateStatus } = require("discord.js")
+const Task = require("@domain/models/Task")
 
 class PresenceUpdate extends Task {
     constructor(client) {

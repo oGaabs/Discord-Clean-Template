@@ -1,4 +1,4 @@
-const { Client, Events, REST, Routes } = require("discord.js")
+const { Client, REST, Routes } = require("discord.js")
 const logger = require("../../utils/Logger")
 
 const MessageService = require("./MessageService")
@@ -12,7 +12,7 @@ class DiscordService extends Client {
         this.logger = configurations.logger || logger
         this.rest = configurations.rest || new REST({ version: "10" }).setToken(process.env.CLIENT_TOKEN)
 
-        this.interactionHandler = configurations.interactionHandler || null
+        this.commandHandler = configurations.commandHandler || null
         this.messageService = configurations.messageService || new MessageService()
         this.eventService = configurations.eventService || EventService
     }
@@ -21,17 +21,12 @@ class DiscordService extends Client {
         this.eventService.onClientReady(this, callback)
     }
 
-    onMessageCreate(callback) {
-        this.eventService.onMessageCreate(this, callback)
-    }
-
-    onInteractionCreate(callback) {
-        this.eventService.onInteractionCreate(this, callback)
-    }
-
     async start(token) {
-        this.on(Events.InteractionCreate, (interaction) => {
-            this.interactionHandler.handleInteraction(interaction, this)
+        this.eventService.onInteractionCreate(this, (interaction) => {
+            this.commandHandler.handleInteraction(interaction, this)
+        })
+        this.eventService.onMessageCreate(this, (message) => {
+            this.commandHandler.handleMessageInteraction(message, this)
         })
 
         await this.loginInDiscordAPI(token)
@@ -40,6 +35,15 @@ class DiscordService extends Client {
     async registerSlashCommands(commands) {
         await this.rest.put(
             Routes.applicationCommands(this.user.id),
+            { body: commands },
+        )
+            .then(() => this.logger.warn("[DEBUG] ::", "Slash Commands registrados com sucesso!", true))
+            .catch((err) => this.logger.error("[FAIL] ::", "Falha ao registrar os Slash Commands : " + err, true))
+    }
+
+    async registerSlashCommandsGuild(guildId, commands) {
+        await this.rest.put(
+            Routes.applicationGuildCommands(this.user.id, guildId),
             { body: commands },
         )
             .then(() => this.logger.warn("[DEBUG] ::", "Slash Commands registrados com sucesso!", true))

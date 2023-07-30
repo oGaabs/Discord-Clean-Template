@@ -21,7 +21,7 @@ class RandomNumber extends SlashCommand {
                 ).toJSON(),
             aliases: [""],
             description: "Gera um número aleatório",
-            category: "privados",
+            category: "informacao",
         })
     }
 
@@ -33,10 +33,24 @@ class RandomNumber extends SlashCommand {
         const max = interaction.options.getInteger("max")
 
         // send the message
-        client.messageService.sendInteractionReply(interaction, this.generateRandomNumberWith(min, max).toString())
+        client.messageService.sendInteractionReply(interaction, this.generateRandomNumberInRange(min, max).toString())
     }
 
-    generateRandomNumberWith(min, max) { // with min and max and negative numbers
+    async executeFromMessage(message, args, client) {
+        if (!args[0])
+            return client.messageService.replyMessage(message, this.generateRandomNumber().toString())
+
+        const limits = args[0].split("-")
+        const minLimit = parseFloat(limits[0])
+        const maxLimit = parseFloat(limits[1])
+
+        if (isNaN(minLimit) || isNaN(maxLimit))
+            return client.messageService.replyMessage(message, "Insira apenas números válidos!")
+
+        client.messageService.replyMessage(message, this.generateRandomNumberInRange(limits[0], limits[1]).toString())
+    }
+
+    generateRandomNumberInRange(min, max) { // with min and max and negative numbers
         return Math.floor(Math.random() * (max - min + 1)) + min
     }
 

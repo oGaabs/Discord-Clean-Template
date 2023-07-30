@@ -1,6 +1,6 @@
 const { TIMES } = require("@infra/utils/Constants")
-const Task = require("@domain/models/Task")
 const GuildService = require("@infra/services/discord/GuildService")
+const Task = require("@domain/models/Task")
 
 const GUILD_ID = process.env.GUILD_ID
 const LOCAL_CHANNEL = "927167938706931752"

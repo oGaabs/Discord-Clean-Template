@@ -14,30 +14,42 @@ class EventManager {
         })
     }
 
-    handleEvent(event, ...args) {
+    registerEvent(client, event, performOneTime = false) {
+        if (this.eventObserversMap.has(event))
+            return
+
+        if (performOneTime) {
+            return client.once(event, (...args) => {
+                this.notifyAll(event, ...args)
+            })
+        }
+
+        client.on(event, (...args) => {
+            this.notifyAll(event, ...args)
+        })
+    }
+
+    notifyAll(event, ...args) {
         const eventObservers = this.eventObserversMap.get(event)
         if (eventObservers) {
             eventObservers.forEach((observer) => {
                 observer.instance.execute(...args)
                 if (observer.performOneTime)
-                    this.eventObserversMap.delete(event)
+                    this.unregisterObserver(event, observer)
             })
         }
     }
 
-    registerEvent(client, event) {
-        if (this.eventObserversMap.has(event))
-            return
-
-        client.on(event, (...args) => {
-            this.handleEvent(event, ...args)
-        })
+    unregisterObserver(event, observer) {
+        const eventObservers = this.eventObserversMap.get(event)
+        if (eventObservers) {
+            const updatedObservers = eventObservers.filter((obs) => obs.instance !== observer.instance)
+            this.eventObserversMap.set(event, updatedObservers)
+        }
     }
 
-    registerEventPerformOneTime(client, event) {
-        client.once(event, (...args) => {
-            this.handleEvent(event, ...args)
-        })
+    unregisterEvent(event) {
+        this.eventObserversMap.delete(event)
     }
 }
 
