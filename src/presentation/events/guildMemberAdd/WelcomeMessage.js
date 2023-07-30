@@ -14,7 +14,7 @@ class WelcomeMessage extends Listener {
         super(client, {
             eventName: "WelcomeMessage",
             eventDiscord: Events.guildMemberAdd,
-            performOneTime: true,
+            performOneTime: false,
         })
 
         this.memberService = null
