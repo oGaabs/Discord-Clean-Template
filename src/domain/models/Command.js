@@ -4,7 +4,7 @@ class Command {
         this.description = description
     }
 
-    execute(message, args, discordService) {
+    execute(_message, _args, _discordService) {
         throw new Error("Method not implemented")
     }
 }
