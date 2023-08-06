@@ -22,7 +22,10 @@ class CommandHandler {
         if (message.author.bot)
             return
 
-        if (message.content.toLowerCase().startsWith(this.prefix) || message.mentions.has(discordService.user))
+        const startsWithPrefix = message.content.toLowerCase().startsWith(this.prefix)
+        const mentionsBot = message.mentions.has(discordService.user)
+
+        if (startsWithPrefix || mentionsBot)
             return this.handleMessageCommandInteraction(message, discordService)
     }
 
