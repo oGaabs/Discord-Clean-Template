@@ -6,7 +6,7 @@ class SlashCommand {
         this.data = options.data || undefined
         this.description = options.description || undefined
         this.category = options.category || undefined
-        this.args = options.args || undefined
+        this.args = options.args || []
     }
 
     execute(_interaction, _discordService) {
@@ -19,7 +19,7 @@ class SlashCommand {
             data: this.data,
             description: this.description,
             category: this.category,
-            args: this.args
+            args: this.args,
         }
     }
 }
