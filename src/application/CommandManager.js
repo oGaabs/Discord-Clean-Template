@@ -1,6 +1,6 @@
 const { Collection } = require("discord.js")
 const EventManager = require("./EventManager")
-const Scheduler = require("@infrastructure/utils/Scheduler")
+const Scheduler = require("../infrastructure/utils/Scheduler")
 
 class CommandManager {
     constructor(fileReader, prefix, eventManager, scheduler) {
@@ -15,27 +15,27 @@ class CommandManager {
     }
 
     async populateSlashCommands(commandsPath, clientInstance) {
-        const files = this.fileReader.readDirectoryFiles(commandsPath)
+        const commandFiles = this.fileReader.readDirectoryFiles(commandsPath)
 
-        files.forEach((File) => {
+        for (const File of commandFiles) {
             try {
                 const slashCommand = new (File)(clientInstance)
                 const commandName = slashCommand.data.name.toLowerCase()
 
                 this.commands.set(commandName, slashCommand)
             } catch (error) {
-                console.error(error)
+                clientInstance.logger.error("[FAIL] ::", "Error registering slash command: ", error)
             }
-        })
+        }
 
         const slashCommandsToRegister = this.commands.map((slashCommand) => slashCommand.data)
         await clientInstance.registerSlashCommands(slashCommandsToRegister)
     }
 
     async populateListeners(listenersPath, clientInstance) {
-        const files = this.fileReader.readDirectoryFiles(listenersPath)
+        const listenerFiles = this.fileReader.readDirectoryFiles(listenersPath)
 
-        files.forEach((File) => {
+        for (const File of listenerFiles) {
             try {
                 const Listener = new (File)(clientInstance)
                 const listenerName = Listener.eventName
@@ -45,36 +45,46 @@ class CommandManager {
                 this.eventManager.registerEvent(clientInstance, eventDiscord)
                 this.eventManager.registerObserver(eventDiscord, Listener, Listener.performOneTime)
             } catch (error) {
-                console.error(error)
+                clientInstance.logger.error("[FAIL] ::", "Error registering listener: ", error)
             }
-        })
+        }
+
+        clientInstance.logger.warn("[DEBUG] ::", "Listeners registrados com sucesso!", true)
     }
 
     async registerTasks(tasksPath, clientInstance) {
-        const files = this.fileReader.readDirectoryFiles(tasksPath)
+        const taskFiles = this.fileReader.readDirectoryFiles(tasksPath)
 
-        files.forEach((File) => {
+        for (const File of taskFiles) {
             try {
                 const task = new (File)(clientInstance)
-
-                this.scheduler.registerTask(task)
+                await this.scheduler.registerTask(task)
             } catch (error) {
-                console.error(error)
+                clientInstance.logger.error("[FAIL] ::", "Error registering task:", error)
             }
-        })
+        }
 
-        this.scheduler.startTasks()
+        try {
+            this.scheduler.startTasks()
+            clientInstance.logger.warn("[DEBUG] ::", "Tasks registradas com sucesso!", true)
+        } catch (error) {
+            clientInstance.logger.error("[FAIL] ::", "Error starting tasks:", error)
+        }
     }
 
-    async handleInteraction(interaction, discordService) {
+    async handleInteraction(interaction, clientInstance) {
         const slashCommand = this.commands.get(interaction.commandName)
         if (!slashCommand)
             return
 
-        slashCommand.execute(interaction, discordService)
+        try {
+            slashCommand.execute(interaction, clientInstance)
+        } catch (error) {
+            clientInstance.logger.error("[FAIL] ::", "Error executing slashcommand: ", error)
+        }
     }
 
-    async handleMessageCommand(message, discordService) {
+    async handleMessageCommand(message, clientInstance) {
         const args = message.content.slice(this.prefix.length).trim().split(/\s+/)
         const commandName = args.shift().toLowerCase()
 
@@ -82,7 +92,11 @@ class CommandManager {
         if (!messageCommand || messageCommand.executeFromMessage === undefined)
             return
 
-        messageCommand.executeFromMessage(message, args, discordService)
+        try {
+            messageCommand.executeFromMessage(message, args, clientInstance)
+        } catch (error) {
+            clientInstance.logger.error("[FAIL] ::", "Error executing command: ", error)
+        }
     }
 }
 
