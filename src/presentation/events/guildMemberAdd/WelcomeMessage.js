@@ -1,13 +1,13 @@
-const Listener = require("@domain/models/Listener")
 const { EmbedBuilder } = require("discord.js")
+const { COLORS } = require("../../../infrastructure/utils/Constants")
 
-const GuildService = require("@infrastructure/services/discord/GuildService")
-const MemberService = require("@infrastructure/services/discord/MemberService")
-const Events = require("@infrastructure/services/discord/DiscordEvents")
+const GuildService = require("../../../infrastructure/services/discord/GuildService")
+const MemberService = require("../../../infrastructure/services/discord/MemberService")
+const Events = require("../../../infrastructure/services/discord/constants/Events")
+const Listener = require("../../../domain/models/Listener")
 
 const GUILD_ID = process.env.GUILD_ID
-const WELCOME_CHANNEL_ID = "926556773194801153"
-const { COLORS } = require("@infra/utils/Constants")
+const WELCOME_CHANNEL_ID = "926540915819028521"
 
 class WelcomeMessage extends Listener {
     constructor(client) {
@@ -31,7 +31,8 @@ class WelcomeMessage extends Listener {
             throw new Error(`Member with ID ${member.id} not found.`)
         }
 
-        if (!this.guildService.checkIfMemberIsFromGuild(fetchedMember, GUILD_ID))
+        const isFromGuild = await this.guildService.checkIfMemberIsFromGuild(fetchedMember, GUILD_ID)
+        if (!isFromGuild)
             return
 
         this.sendMessageInWelcomeChannel(member, WELCOME_CHANNEL_ID)

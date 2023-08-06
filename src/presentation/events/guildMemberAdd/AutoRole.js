@@ -1,7 +1,8 @@
-const Listener = require("@domain/models/Listener")
+const Listener = require("../../../domain/models/Listener")
 
-const MemberService = require("@infrastructure/services/discord/MemberService")
-const Events = require("@infrastructure/services/discord/DiscordEvents")
+const MemberService = require("../../../infrastructure/services/discord/MemberService")
+const GuildService = require("../../../infrastructure/services/discord/GuildService")
+const Events = require("../../../infrastructure/services/discord/constants/Events")
 
 const LOCAL_GUILD_SEPARATOR_ROLES = {
     "CargosSeparator": "926709141014196265",
@@ -26,6 +27,7 @@ class AutoRole extends Listener {
 
     async execute(member) {
         this.memberService = new MemberService(this.client, member.guild.id, member.id)
+        this.guildService = new GuildService(this.client, member.guild.id)
         const fetchedMember = await this.memberService.getMember(member.id)
 
         if (!fetchedMember) {
@@ -38,7 +40,7 @@ class AutoRole extends Listener {
             return
         }
 
-        if (!this.memberService.checkIfMemberIsFromGuild(fetchedMember, GUILD_ID))
+        if (!this.guildService.checkIfMemberIsFromGuild(fetchedMember, GUILD_ID))
             return
 
         this.addRolesSeparatorsToMember(this.client, member)
@@ -49,7 +51,7 @@ class AutoRole extends Listener {
         const roles = Object.values(LOCAL_GUILD_SEPARATOR_ROLES)
 
         for (const role of roles)
-            await this.memberService.addRoleToMember(member, role)
+            await this.guildService.addRoleToMember(member, role)
 
         return roles
     }
@@ -62,10 +64,10 @@ class AutoRole extends Listener {
             if (role === LOCAL_GUILD_WELCOME_ROLES.BotRole) {
                 if (!memberIsBot)
                     continue
-                await this.memberService.addRoleToMember(member, role)
+                await this.guildService.addRoleToMember(member, role)
             }
 
-            await this.memberService.addRoleToMember(member, role)
+            await this.guildService.addRoleToMember(member, role)
         }
 
         return roles
