@@ -1,16 +1,17 @@
-const { TIMES } = require("@infra/utils/Constants")
-const { ActivityType, PresenceUpdateStatus } = require("discord.js")
-const Task = require("@domain/models/Task")
+const { TimeSpan } = require("../../infrastructure/utils/Constants")
+const { ActivityTypes, PresenceStatus } = require("../../infrastructure/services/discord/constants/Presence")
+
+const Task = require("../../domain/models/Task")
 
 class PresenceUpdate extends Task {
     constructor(client) {
         super(client, {
             taskName: "PresenceUpdate",
-            timerInMiliseconds: TIMES.SECOND * 30,
+            timerInMilliseconds: TimeSpan.fromSeconds(30).totalMilliseconds,
             performOneTime: false,
         })
 
-        this.botStatus = [PresenceUpdateStatus.Online, PresenceUpdateStatus.DoNotDisturb, PresenceUpdateStatus.Idle]
+        this.botStatus = [PresenceStatus.Online, PresenceStatus.DoNotDisturb, PresenceStatus.Idle]
     }
 
     async execute() {
@@ -18,9 +19,9 @@ class PresenceUpdate extends Task {
 
         try {
             const activities = [
-                { name: "listening to your commands!", type: ActivityType.Listening },
-                { name: "your messages", type: ActivityType.Watching },
-                { name: "with Discord.js", type: ActivityType.Playing },
+                { name: "listening to your commands!", type: ActivityTypes.Listening },
+                { name: "your messages", type: ActivityTypes.Watching },
+                { name: "with Discord.js", type: ActivityTypes.Playing },
             ]
 
             const activity = activities[Math.floor(Math.random() * activities.length)]
