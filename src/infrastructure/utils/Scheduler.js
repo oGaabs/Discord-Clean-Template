@@ -11,14 +11,18 @@ class Scheduler {
 
     startTasks() {
         this.tasks.forEach((task) => {
-            const secondsInterval = task.timerInMiliseconds / 1000
-            if (task.performOneTime) {
-                cron.schedule(secondsInterval + " * * * * *", async () => task.execute())
-                return
-            }
-
-            cron.schedule("*/" + secondsInterval + " * * * * *", async () => task.execute())
+            this.scheduleTask(task)
         })
+    }
+
+    scheduleTask(task) {
+        const secondsInterval = task.timerInMilliseconds / 1000
+        if (task.performOneTime) {
+            cron.schedule(secondsInterval + " * * * * *", async () => task.execute())
+            return
+        }
+
+        cron.schedule("*/" + secondsInterval + " * * * * *", async () => task.execute())
     }
 }
 
