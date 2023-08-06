@@ -19,15 +19,15 @@ class MemberService {
         return await this.guild.getMemberByNickname(memberNickname)
     }
 
-    async isBot(member) {
+    isBot(member) {
         return member.user.bot
     }
 
-    async isMember(member) {
+    isMember(member) {
         return !member.user.bot
     }
 
-    async isMemberManageable(member) {
+    isMemberManageable(member) {
         return member.manageable
     }
 
