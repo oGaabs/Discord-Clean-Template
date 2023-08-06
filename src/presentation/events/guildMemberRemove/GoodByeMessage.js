@@ -1,13 +1,13 @@
-const Listener = require("@domain/models/Listener")
 const { EmbedBuilder } = require("discord.js")
+const { COLORS } = require("../../../infrastructure/utils/Constants")
 
-const GuildService = require("@infrastructure/services/discord/GuildService")
-const MemberService = require("@infrastructure/services/discord/MemberService")
-const Events = require("@infrastructure/services/discord/DiscordEvents")
+const Listener = require("../../../domain/models/Listener")
+const GuildService = require("../../../infrastructure/services/discord/GuildService")
+const MemberService = require("../../../infrastructure/services/discord/MemberService")
+const Events = require("../../../infrastructure/services/discord/constants/Events")
 
 const GUILD_ID = process.env.GUILD_ID
-const GOODBYE_CHANNEL_ID = "926556773194801153"
-const { COLORS } = require("@infra/utils/Constants")
+const GOODBYE_CHANNEL_ID = "926540915819028521"
 
 class GoodByeMessage extends Listener {
     constructor(client) {

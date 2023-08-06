@@ -1,6 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js")
-const SlashCommand = require("@domain/models/SlashCommand.js")
-
+const SlashCommand = require("../../../domain/models/SlashCommand.js")
 
 class Ping extends SlashCommand {
     constructor(client) {

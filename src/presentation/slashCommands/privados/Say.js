@@ -1,5 +1,5 @@
 const { SlashCommandBuilder } = require("discord.js")
-const SlashCommand = require("@domain/models/SlashCommand.js")
+const SlashCommand = require("../../../domain/models/SlashCommand.js")
 
 /* The Say class is a JavaScript class that extends the SlashCommand class and allows the bot to
 reproduce a given message. */
