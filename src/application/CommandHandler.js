@@ -1,3 +1,5 @@
+// const InteractionFactory = require("./factory/interactionFactory")
+
 class CommandHandler {
     constructor(commandManager, prefix) {
         this.commandManager = commandManager
@@ -8,14 +10,16 @@ class CommandHandler {
         if (interaction.user.bot)
             return
 
+        // const interaction = InteractionFactory.create_interaction(interaction)
+
         if (interaction.isCommand())
-            return this.handleCommandInteraction(interaction, discordService)
+            return this.commandManager.handleInteraction(interaction, discordService)
 
         if (interaction.isButton())
-            return this.handleButtonInteraction(interaction, discordService)
+            return this.commandManager.handleButton(interaction, discordService)
 
         if (interaction.isSelectMenu())
-            return this.handleSelectMenuInteraction(interaction, discordService)
+            return this.commandManager.handleSelectMenu(interaction, discordService)
     }
 
     async handleMessageInteraction(message, discordService) {
@@ -27,18 +31,6 @@ class CommandHandler {
 
         if (startsWithPrefix || mentionsBot)
             return this.handleMessageCommandInteraction(message, discordService)
-    }
-
-    async handleCommandInteraction(command, discordService) {
-        await this.commandManager.handleInteraction(command, discordService)
-    }
-
-    async handleButtonInteraction(button, discordService) {
-        await this.commandManager.handleButton(button, discordService)
-    }
-
-    async handleSelectMenuInteraction(selectMenu, discordService) {
-        await this.commandManager.handleSelectMenu(selectMenu, discordService)
     }
 
     async handleContextMenuInteraction(contextMenu, discordService) {
