@@ -8,7 +8,12 @@ const taskSchema = z.object({
 
 class Task {
     constructor(client, options) {
-        const validatedOptions = taskSchema.parse(options)
+        let validatedOptions
+        try {
+            validatedOptions = taskSchema.parse(options)
+        } catch (error) {
+            throw new Error(`Invalid options passed to Task: ${error.message}`)
+        }
 
         this.client = client
         this.taskName = validatedOptions.taskName

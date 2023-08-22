@@ -1,12 +1,30 @@
+const { z } = require("zod")
+// data with unknown keys
+
+const slashCommandSchema = z.object(
+    {
+        name: z.string(),
+        description: z.string(),
+        category: z.string(),
+        aliases: z.array(z.string()).optional(),
+    },
+)
+
 class SlashCommand {
     constructor(client, options) {
-        this.client = client
+        let validatedOptions
+        try {
+            validatedOptions = slashCommandSchema.parse(options, { strict: false })
+        } catch (error) {
+            throw new Error(`Invalid options passed to SlashCommand: ${error}`)
+        }
 
-        this.name = options.name || undefined
-        this.data = options.data || undefined
-        this.description = options.description || undefined
-        this.category = options.category || undefined
-        this.args = options.args || []
+        this.client = client
+        this.name = validatedOptions.name
+        this.data = options.data
+        this.description = validatedOptions.description
+        this.category = validatedOptions.category
+        this.aliases = validatedOptions.aliases || []
     }
 
     execute(_interaction, _discordService) {
@@ -19,7 +37,7 @@ class SlashCommand {
             data: this.data,
             description: this.description,
             category: this.category,
-            args: this.args,
+            aliases: this.aliases,
         }
     }
 }

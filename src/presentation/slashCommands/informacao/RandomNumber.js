@@ -20,7 +20,7 @@ class RandomNumber extends SlashCommand {
                         .setDescription("Digite o número máximo")
                         .setRequired(true),
                 ).toJSON(),
-            aliases: [""],
+            aliases: ["rnd", "random", "aleatorio", "aleatório"],
             description: "Gera um número aleatório",
             category: "informacao",
         })
