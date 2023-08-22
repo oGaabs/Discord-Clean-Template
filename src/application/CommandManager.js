@@ -14,6 +14,12 @@ class CommandManager {
         this.fileReader = fileReader
     }
 
+    getCommand(commandName) {
+        return this.commands.find(
+            (cmd) =>cmd.name === commandName || (cmd.aliases?.includes(commandName)),
+        )
+    }
+
     async populateSlashCommands(commandsPath, clientInstance) {
         const commandFiles = this.fileReader.readDirectoryFiles(commandsPath)
 
@@ -24,7 +30,7 @@ class CommandManager {
 
                 this.commands.set(commandName, slashCommand)
             } catch (error) {
-                clientInstance.logger.error("[FAIL] ::", "Error registering slash command: ", error)
+                clientInstance.logger.error("[FAIL] ::", `Error registering slash command ${File.name}: \n` + error)
             }
         }
 
@@ -45,11 +51,11 @@ class CommandManager {
                 this.eventManager.registerEvent(clientInstance, eventDiscord)
                 this.eventManager.registerObserver(eventDiscord, Listener, Listener.performOneTime)
             } catch (error) {
-                clientInstance.logger.error("[FAIL] ::", "Error registering listener: ", error)
+                clientInstance.logger.error("[FAIL] ::", `Error registering listener ${File.name}: \n`+ error)
             }
         }
 
-        clientInstance.logger.warn("[DEBUG] ::", "Listeners registrados com sucesso!", true)
+        clientInstance.logger.warn("[DEBUG] ::", "Listeners registrados!", true)
     }
 
     async registerTasks(tasksPath, clientInstance) {
@@ -60,15 +66,15 @@ class CommandManager {
                 const task = new (File)(clientInstance)
                 await this.scheduler.registerTask(task)
             } catch (error) {
-                clientInstance.logger.error("[FAIL] ::", "Error registering task:", error)
+                clientInstance.logger.error("[FAIL] ::", `Error registering task ${File.name}: \n`+ error)
             }
         }
 
         try {
             this.scheduler.startTasks()
-            clientInstance.logger.warn("[DEBUG] ::", "Tasks registradas com sucesso!", true)
+            clientInstance.logger.warn("[DEBUG] ::", "Tasks registradas!", true)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error starting tasks:", error)
+            clientInstance.logger.error("[FAIL] ::", "Error starting tasks: \n"+ error)
         }
     }
 
@@ -80,7 +86,7 @@ class CommandManager {
         try {
             slashCommand.execute(interaction, clientInstance)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error executing slashcommand: ", error)
+            clientInstance.logger.error("[FAIL] ::", "Error executing slashcommand: "+ error)
         }
     }
 
@@ -88,14 +94,14 @@ class CommandManager {
         const args = message.content.slice(this.prefix.length).trim().split(/\s+/)
         const commandName = args.shift().toLowerCase()
 
-        const messageCommand = this.commands.get(commandName)
+        const messageCommand = this.getCommand(commandName)
         if (!messageCommand || messageCommand.executeFromMessage === undefined)
             return
 
         try {
             messageCommand.executeFromMessage(message, args, clientInstance)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error executing command: ", error)
+            clientInstance.logger.error("[FAIL] ::", "Error executing command: "+ error)
         }
     }
 }
