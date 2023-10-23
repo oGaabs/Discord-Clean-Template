@@ -4,40 +4,36 @@ const logger = require("./Logger")
 
 class CommandFileReader {
     constructor(options = {}) {
-        this.files = options.files || []
         this.logger = options.logger || logger
     }
 
     readDirectoryFiles(directoryPath, jsFiles = []) {
-        this.loadDirectory(directoryPath, jsFiles)
+        this.loadDirectoryFilesRecursively(directoryPath, jsFiles)
 
         return jsFiles
     }
 
-    loadDirectory(currentPath, jsFiles = []) {
+    loadDirectoryFilesRecursively(currentPath, jsFiles = []) {
         console.log(`\n[${logger.getCurrentDateTime()}] Directory: ${currentPath.split("/").pop()}`)
 
         try {
-            // Le os arquivos de comando no caminho especificado e armazena-os no this.commands
             const files = Fs.readdirSync(currentPath)
 
             files.forEach((file, index) => {
                 const filePath = Path.join(currentPath, file)
-                const stats = Fs.statSync(filePath)
+                const fileInfo = Fs.statSync(filePath)
 
-                // Caso seja um arquivo, carrega para o array
-                if (stats.isFile() && file.endsWith(".js"))
+                if (fileInfo.isFile() && file.endsWith(".js"))
                     this.loadClassFromFile(jsFiles, filePath, index)
 
-                // Caso se um diretorio, carrega todos os arquivos dentro dele
-                if (stats.isDirectory())
-                    this.loadDirectory(filePath, jsFiles)
+                if (fileInfo.isDirectory())
+                    this.loadDirectoryFilesRecursively(filePath, jsFiles)
             })
 
             return jsFiles
         } catch (err) {
-            console.error(`An error occurred while processing directory: ${currentPath}`)
-            console.error(err)
+            this.logger.error(`An error occurred while processing directory: ${currentPath}`)
+            this.logger.error(err)
         }
     }
 
@@ -48,8 +44,8 @@ class CommandFileReader {
 
             this.logger.debug("[DEBUG] ::", ` (${++index}/${jsFiles.length}) Loaded ${filePath}.`)
         } catch (err) {
-            console.error(err)
-            this.logger.error("[FAIL] ::", `(${++index}) Fail when loading ${filePath}.`, false, err)
+            this.logger.error("[FAIL] ::", `(${++index}) Failed to load ${filePath}:`, false)
+            this.logger.error(err)
         }
     }
 }

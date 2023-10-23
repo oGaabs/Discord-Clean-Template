@@ -1,5 +1,3 @@
-// const InteractionFactory = require("./factory/interactionFactory")
-
 class CommandHandler {
     constructor(commandManager, prefix) {
         this.commandManager = commandManager
@@ -10,16 +8,17 @@ class CommandHandler {
         if (interaction.user.bot)
             return
 
-        // const interaction = InteractionFactory.create_interaction(interaction)
-
         if (interaction.isCommand())
             return this.commandManager.handleInteraction(interaction, discordService)
 
-        if (interaction.isButton())
+        /* if (interaction.isButton())
             return this.commandManager.handleButton(interaction, discordService)
 
         if (interaction.isSelectMenu())
             return this.commandManager.handleSelectMenu(interaction, discordService)
+
+        if (interaction.isContextMenu())
+            return this.commandManager.handleContextMenu(interaction, discordService)*/
     }
 
     async handleMessageInteraction(message, discordService) {
