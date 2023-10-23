@@ -16,8 +16,20 @@ class CommandManager {
 
     getCommand(commandName) {
         return this.commands.find(
-            (cmd) =>cmd.name === commandName || (cmd.aliases?.includes(commandName)),
+            (cmd) => cmd.name === commandName || (cmd.aliases?.includes(commandName)),
         )
+    }
+
+    getListener(listenerName) {
+        return this.listeners.get(listenerName)
+    }
+
+    registerCommand(name, commandClass) {
+        this.commands.set(name, commandClass)
+    }
+
+    registerListener(name, listenerClass) {
+        this.listeners.set(name, listenerClass)
     }
 
     async populateSlashCommands(commandsPath, clientInstance) {
@@ -28,7 +40,7 @@ class CommandManager {
                 const slashCommand = new (File)(clientInstance)
                 const commandName = slashCommand.data.name.toLowerCase()
 
-                this.commands.set(commandName, slashCommand)
+                this.registerCommand(commandName, slashCommand)
             } catch (error) {
                 clientInstance.logger.error("[FAIL] ::", `Error registering slash command ${File.name}: \n` + error)
             }
@@ -47,11 +59,11 @@ class CommandManager {
                 const listenerName = Listener.eventName
                 const eventDiscord = Listener.eventDiscord
 
-                this.listeners.set(listenerName, Listener)
+                this.registerListener(listenerName, Listener)
                 this.eventManager.registerEvent(clientInstance, eventDiscord)
                 this.eventManager.registerObserver(eventDiscord, Listener, Listener.performOneTime)
             } catch (error) {
-                clientInstance.logger.error("[FAIL] ::", `Error registering listener ${File.name}: \n`+ error)
+                clientInstance.logger.error("[FAIL] ::", `Error registering listener ${File.name}: \n` + error)
             }
         }
 
@@ -66,7 +78,7 @@ class CommandManager {
                 const task = new (File)(clientInstance)
                 await this.scheduler.registerTask(task)
             } catch (error) {
-                clientInstance.logger.error("[FAIL] ::", `Error registering task ${File.name}: \n`+ error)
+                clientInstance.logger.error("[FAIL] ::", `Error registering task ${File.name}: \n` + error)
             }
         }
 
@@ -74,34 +86,33 @@ class CommandManager {
             this.scheduler.startTasks()
             clientInstance.logger.warn("[DEBUG] ::", "Tasks registradas!", true)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error starting tasks: \n"+ error)
+            clientInstance.logger.error("[FAIL] ::", "Error starting tasks: \n" + error)
         }
     }
 
     async handleInteraction(interaction, clientInstance) {
         const slashCommand = this.commands.get(interaction.commandName)
-        if (!slashCommand)
-            return
+        if (!slashCommand) return
 
         try {
             slashCommand.execute(interaction, clientInstance)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error executing slashcommand: "+ error)
+            clientInstance.logger.error("[FAIL] ::", "Error executing slashcommand: " + error)
         }
     }
 
     async handleMessageCommand(message, clientInstance) {
-        const args = message.content.slice(this.prefix.length).trim().split(/\s+/)
+        const whitespaceRegex = /\s+/
+        const args = message.content.slice(this.prefix.length).trim().split(whitespaceRegex)
         const commandName = args.shift().toLowerCase()
 
         const messageCommand = this.getCommand(commandName)
-        if (!messageCommand || messageCommand.executeFromMessage === undefined)
-            return
+        if (!messageCommand || messageCommand.executeFromMessage === undefined) return
 
         try {
             messageCommand.executeFromMessage(message, args, clientInstance)
         } catch (error) {
-            clientInstance.logger.error("[FAIL] ::", "Error executing command: "+ error)
+            clientInstance.logger.error("[FAIL] ::", "Error executing command: " + error)
         }
     }
 }

@@ -18,11 +18,11 @@ class Scheduler {
     scheduleTask(task) {
         const secondsInterval = task.timerInMilliseconds / 1000
         if (task.performOneTime) {
-            cron.schedule(secondsInterval + " * * * * *", async () => task.execute())
+            cron.schedule(`${secondsInterval} * * * * *`, async () => task.execute())
             return
         }
 
-        cron.schedule("*/" + secondsInterval + " * * * * *", async () => task.execute())
+        cron.schedule(`*/${secondsInterval} * * * * *`, async () => task.execute())
     }
 }
 
